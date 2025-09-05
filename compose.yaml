@@ -1,0 +1,16 @@
+services:
+  # Rsync Client to back up from this NAS to another NAS via rsync and cron
+  # see https://github.com/eea/eea.docker.rsync for examples, multiple CRON_TASK_ env vars are allowed
+  rsync-backup:
+    image: eeacms/rsync 
+    container_name: rsync-client
+    environment:
+      - CRON_TASK_1=0 3 * * * rsync -avz -e 'ssh -p 22' /source/ rsync@<MY-IP>::backups # backup all folders at 3am - MODIFY FOR YOUR IP
+    volumes:
+      - /volume1/audiobooks:/source/audiobooks:ro # NAS Volume 1 (read only) only audiobooks share - MODIFY AS NEEDED
+      - /etc/localtime:/etc/localtime:ro # Mount the host's localtime file as read-only
+      - ./ssh_host_keys:/ssh_host_keys # Persist host keys
+      - ./ssh-key:/root/.ssh # Persist client keys
+    command: "client"
+    restart: unless-stopped
+  
