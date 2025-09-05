@@ -13,7 +13,7 @@ UGREEN's sync app doesn't seem to support basic rsync. This attempts to solve it
 
 It uses `rsync`, via a public Docker image based on the lightweight Linux Alpine, and `cron`, to enable your NAS to use rsync to some other NAS and copy changes.
 
-You can customize the cron schedule, and the sources and destinations, by adding more `CRON_TASK_` entries to the compose.yaml file, and you can mount multiple volumes locally, and communicate with more than one other system.
+You can customize the cron schedule, and the sources and destinations, by adding more `CRON_TASK_` entries to the [compose.yaml](https://github.com/rogertheriault/ugreen-docker-rsync-client/blob/main/compose.yaml) file, and you can mount multiple volumes locally, and communicate with more than one other system.
 
 And, beyond the scope here, you could run the same image as an rsync server container by checking the references and modifying the compose file.
 
