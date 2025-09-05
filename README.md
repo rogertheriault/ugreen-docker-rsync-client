@@ -107,5 +107,6 @@ To exclude certain file patterns, or any other custom handling, see the [rsync m
 - there may be a better way to handle rsync on a Synology without using ssh, supposedly it has a daemon
 - if that NAS is not just a backup server, and has other users, please make sure all admins have strong passwords, add firewall rules, disable password use in the ssh daemon and set up keys for your admin users, change the ssh port, whatever... that's beyond the scope of this but it is very important for security
 - it's possible the docker logs grow without being archived or truncated (though, I noticed the UI only shows a few recent lines). Keep an eye out for that kind of thing
+- when restarting the Docker project for any reason, the public key will be echoed out again. It *should* be the same as before, so ignore the message to put it in authorized_keys unless for some reason it changes (which will probably only happen if you wipe out the docker subdirectory it's stored in)
 
 
