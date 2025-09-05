@@ -11,7 +11,7 @@ If you need versioned backup, try the UGREEN "sync and backup" app. This project
 ### rsync
 UGREEN's sync app doesn't seem to support basic rsync. This attempts to solve it, without major modifications inside the UGREEN filesystem, by adding a docker project through the UGREEN Docker app.
 
-It uses `rsync`, via a public Docker module, and `cron`, to enable your NAS to use rsync to some other NAS and copy changes.
+It uses `rsync`, via a public Docker image based on the lightweight Linux Alpine, and `cron`, to enable your NAS to use rsync to some other NAS and copy changes.
 
 You can customize the cron schedule, and the sources and destinations, by adding more `CRON_TASK_` entries to the compose.yaml file, and you can mount multiple volumes locally, and communicate with more than one other system.
 
