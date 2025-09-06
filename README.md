@@ -84,10 +84,11 @@ Warning: Permanently added '10.10.99.42' (ED25519) to the list of known hosts.
 This will be accessible on the NAS in that `ssh-key` folder in a file named `known_hosts`
 
 11. If you're not quite ready, you can still list the rsync "modules" available (see the man page) with `rsync 10.10.99.42::` (use your Synology's IP, and add two colons)
-12. Look for the Docker directory and your project... in my case it was in `/volume2/docker/rsync`
-13. **IMPORTANT** another reason we're here... lock down the ssh-key file! `cd /volume2/docker/rsync` and `sudo chmod 700 ssh-key ssh_host_keys` (notice most of these files are owned by root) so other users can't access them
-14. To confirm the permissions change didn't cause issues, you can pop back into the container and try an rsync command.
-15. Go into the Synology UI and check the contents of your backups shared folder.
+12. End the shell session in the container with `exit`, to drop back into your UGREEN.
+13. Look for the Docker directory and your project... in my case it was in `/volume2/docker/rsync`
+14. **IMPORTANT** another reason we're here... lock down the ssh-key file! `cd /volume2/docker/rsync` and `sudo chmod 700 ssh-key ssh_host_keys` (notice most of these files are owned by root) so other users can't access them
+15. To confirm the permissions change didn't cause issues, you can pop back into the container and try an rsync command.
+16. Go into the Synology UI and check the contents of your backups shared folder.
 
 
 # Conclusion
