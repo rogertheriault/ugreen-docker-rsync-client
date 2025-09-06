@@ -66,10 +66,26 @@ I'm assuming some unix/linux knowledge here, and I may be a bit overly descripti
 7. take a look inside the running container with `docker exec -it rsync-client sh` which will give you a shell in the Alpine container.
 8. If you already mapped a folder in the volumes section of the compose file, it should be under `/source`, e.g. `ls -la /source`
 9. If you specified a cron command, or multiple, `crontab -l` should list them
-10. You can run a test rsync command here to your synology if you like, just copy the command from the CRON line without the cron scheduling, e.g. `rsync -avz -e "ssh -p 22" /source rsync@10.10.99.42::backups` if you already mounted say a test share to `/source`. It should copy everything and log it. Run it again, it shouldn't copy anything.
+10. **Run a test rsync command** here to your synology, to verify and also to save the destination host key
+
+Just copy the command from the CRON line without the cron scheduling, e.g. `rsync -avz -e "ssh -p 22" /source rsync@10.10.99.42::backups` if you already mounted say a test share to `/source`. It should copy everything and log it. Run it again, it shouldn't copy anything. If you're not ready to actually copy stuff, substitute something else for `/source` for now.
+
+The reason for doing this (I may have mentioned this was complicated) is you'll be prompted, inside the container, to add the key fingerprint of the host you are connecting to to the .ssh/known_hosts file. If you do not do this, wonderful security will prevent your connection when the cron task runs!
+
+So when prompted, answer yes. Assuming you got the IP correct.
+```
+/ # rsync -avz -e 'ssh -p 22' /source/ rsync@10.10.99.42::backups
+The authenticity of host '10.10.99.42 (10.10.99.42)' can't be established.
+ED25519 key fingerprint is SHA256:BdZ+/d/randomcharsgohere-T5RuvWTQHObO5zXU.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '10.10.99.42' (ED25519) to the list of known hosts.
+```
+This will be accessible on the NAS in that `ssh-key` folder in a file named `known_hosts`
+
 11. If you're not quite ready, you can still list the rsync "modules" available (see the man page) with `rsync 10.10.99.42::` (use your Synology's IP, and add two colons)
 12. Look for the Docker directory and your project... in my case it was in `/volume2/docker/rsync`
-13. **IMPORTANT** the reason we're here... lock down the ssh-key file! `cd /volume2/docker/rsync` and `sudo chmod 700 ssh-key ssh_host_keys` (notice most of these files are owned by root) so other users can't access them
+13. **IMPORTANT** another reason we're here... lock down the ssh-key file! `cd /volume2/docker/rsync` and `sudo chmod 700 ssh-key ssh_host_keys` (notice most of these files are owned by root) so other users can't access them
 14. To confirm the permissions change didn't cause issues, you can pop back into the container and try an rsync command.
 15. Go into the Synology UI and check the contents of your backups shared folder.
 
@@ -108,5 +124,6 @@ To exclude certain file patterns, or any other custom handling, see the [rsync m
 - if that NAS is not just a backup server, and has other users, please make sure all admins have strong passwords, add firewall rules, disable password use in the ssh daemon and set up keys for your admin users, change the ssh port, whatever... that's beyond the scope of this but it is very important for security
 - it's possible the docker logs grow without being archived or truncated (though, I noticed the UI only shows a few recent lines). Keep an eye out for that kind of thing
 - when restarting the Docker project for any reason, the public key will be echoed out again. It *should* be the same as before, so ignore the message to put it in authorized_keys unless for some reason it changes (which will probably only happen if you wipe out the docker subdirectory it's stored in)
+- and if you change the server IP or add a new destination, please see the notes above regarding `known_hosts`
 
 
