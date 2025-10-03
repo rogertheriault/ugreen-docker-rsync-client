@@ -34,9 +34,10 @@ I'm assuming some unix/linux knowledge here, and I may be a bit overly descripti
 3. Name the project (in my case, I called it rsync; keep it short, it's going to be the name of a folder on your filesystem)
 4. Choose a storage location. If you have an NVME (M.2) volume, use that!
 5. Paste or upload the contents of the compose.yaml file here into the "compose configuration" editor (and modify as needed, e.g. the IP address of your destination, the volumes you want to backup, and the backup destination)
-6. BUT IF you don't know those yet, we'll get to that below... however, in this case, the share "audiobooks" in "Volume 1" has a path `/volume1/audiobooks` and I exposed it inside the container as read-only in `/source/audiobooks`
-7. Comment out the CRON env var for now, there's more stuff to set up
-8. Uncheck "run immediately after creation"
+6. BUT IF you don't know those yet, we'll get to that below... however, in this case, the share "audiobooks" in "Volume 1" has a path `/volume1/audiobooks` and I exposed it inside the container as read-only in
+   `/source/audiobooks`
+8. Comment out the CRON env var for now, there's more stuff to set up
+9. Uncheck "run immediately after creation"
 
 ### tips
 - do not put quotes after the = in the cron entries, it will wind up in the cronfile
@@ -57,18 +58,20 @@ I'm assuming some unix/linux knowledge here, and I may be a bit overly descripti
 13. Log out of your ssh session, and go to the Synology Terminal control panel, and restart ssh services by disabling, apply, re-enabling, apply
 
 ## Back to the UGREEN (some of this is optional)
-1. Turn on ssh, and set the expiration according to your needs
+1. Turn on ssh from the control panel, and set the expiration according to your needs (or skip to step 7 for an alternate option)
 2. Make sure your admin user has a home directory, if it doesn't, give it one
 3. Ssh in to the UGREEN as that admin user
 4. To save time now and in the future, `sudo usermod -aG docker yourusername` to add your user to the docker group
 5. exit and ssh back in
 6. run `docker ps` and if your project is still running it'll show up
-7. take a look inside the running container with `docker exec -it rsync-client sh` which will give you a shell in the Alpine container.
+7. Take a look inside the running container in one of two ways:
+   - If you already followed steps 1-6 and are shelled in, run `docker exec -it rsync-client sh` which will give you a shell in the Alpine container
+   - If you are using the Docker UI, locate the running rsync container, click the [ ... ] More item on the right, and select Settings, then click the Terminal tab and Add a connection. Choose "sh" as the shell command. 
 8. If you already mapped a folder in the volumes section of the compose file, it should be under `/source`, e.g. `ls -la /source`
 9. If you specified a cron command, or multiple, `crontab -l` should list them
-10. **Run a test rsync command** here to your synology, to verify and also to save the destination host key
+10. **Run a test rsync command** here to your synology, to verify and also to save the destination host key.
 
-Just copy the command from the CRON line without the cron scheduling, e.g. `rsync -avz -e "ssh -p 22" /source rsync@10.10.99.42::backups` if you already mounted say a test share to `/source`. It should copy everything and log it. Run it again, it shouldn't copy anything. If you're not ready to actually copy stuff, substitute something else for `/source` for now.
+Just copy the command from the CRON line without the cron scheduling, e.g. `rsync -avz -e "ssh -p 22" /source rsync@10.10.99.42::backups` if you already mounted say a test share to `/source`. It should copy everything and log it. Run it again, it shouldn't copy anything. If you're not ready to actually copy stuff, substitute something else for `/source` for now, or simply run `ssh rsync@synology-ip-or-hostname`.
 
 The reason for doing this (I may have mentioned this was complicated) is you'll be prompted, inside the container, to add the key fingerprint of the host you are connecting to to the .ssh/known_hosts file. If you do not do this, wonderful security will prevent your connection when the cron task runs!
 
@@ -82,6 +85,8 @@ Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
 Warning: Permanently added '10.10.99.42' (ED25519) to the list of known hosts.
 ```
 This will be accessible on the NAS in that `ssh-key` folder in a file named `known_hosts`
+
+**NOTE** If you change the IP address in the future, simply go into the (running) container and ssh as rsync to the new IP to get a prompt and add the host key to `known_hosts`
 
 11. If you're not quite ready, you can still list the rsync "modules" available (see the man page) with `rsync 10.10.99.42::` (use your Synology's IP, and add two colons)
 12. End the shell session in the container with `exit`, to drop back into your UGREEN.
